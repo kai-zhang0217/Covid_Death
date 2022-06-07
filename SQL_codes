@@ -1,0 +1,55 @@
+SELECT *
+FROM coviddeaths
+WHERE continent is not null
+order by 3,4;
+
+#Select data that we are going to use
+SELECT Location, date, total_cases, new_cases, total_deaths, population
+FROM coviddeaths
+WHERE continent is not null
+order by 1,STR_TO_DATE(date, '%d-%m-%y');
+
+#Looking at the total cases vs total deaths
+#Shows the likelihood of dying if you contract covid in the United States
+SELECT location, date, total_cases, total_deaths, (total_deaths/total_cases)*100 Death_Percentage
+FROM coviddeaths
+WHERE location like '%states%'
+AND continent is not null
+order by 1,STR_TO_DATE(date, '%d-%m-%y');
+
+#Looking at the total cases vs population
+#Shows what percentage of the population got Covid
+SELECT Location, date, population, total_cases, (total_cases/population)*100 Percent_Population_Infected
+FROM coviddeaths
+WHERE location like '%states%'
+AND continent is not null
+order by 1,STR_TO_DATE(date, '%d-%m-%y');
+
+#Which country has the highest infection rate compared to population?
+SELECT Location, population, MAX(total_cases) highest_infection_count, MAX((total_cases/population))*100 Percent_Population_Infected
+FROM coviddeaths
+WHERE continent is not null
+GROUP BY Location, Population
+order by Percent_Population_Infected desc;
+
+#Showing continents with the total death counts
+SELECT continent, MAX(cast(conv(total_deaths,16,10) AS UNSIGNED)) Total_Death_Counts
+FROM coviddeaths
+WHERE continent is not null
+GROUP BY continent
+order by Total_Death_Counts desc;
+
+#Global numbers
+SELECT date, SUM(new_cases) total_new_cases, SUM(new_deaths) total_new_deaths, (sum(new_deaths)/sum(new_cases))*100 new_death_percentage
+FROM coviddeaths
+WHERE continent is not null
+GROUP BY date
+order by STR_TO_DATE(date, '%d-%m-%y');
+
+SELECT SUM(new_cases) total_new_cases, SUM(new_deaths) total_new_deaths, (sum(new_deaths)/sum(new_cases))*100 new_death_percentage
+FROM coviddeaths
+WHERE continent is not null
+order by 1,2;
+
+
+
